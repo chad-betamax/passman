@@ -6,9 +6,11 @@ use std::path::PathBuf;
 pub struct Config {
     pub base_dir: PathBuf,
     pub prefix: PathBuf,
-    pub identities_file: PathBuf,
-    pub extensions_dir: PathBuf,
-    pub clip_time: u64,
+    pub secret: PathBuf,
+    #[allow(dead_code)]
+    pub extensions_dir: PathBuf, //  dir for external binaries that can be called
+    #[allow(dead_code)]
+    pub clip_time: u64, // do we want clipboard support?
 }
 
 pub fn load_config() -> Result<Config> {
@@ -16,18 +18,18 @@ pub fn load_config() -> Result<Config> {
         .map(PathBuf::from)
         .unwrap_or_else(|_| dirs::home_dir().unwrap().join(".passman"));
 
-    let prefix = base_dir.join("store");
-    let identities_file = base_dir.join("identities");
+    let prefix = base_dir.join("vault");
+    let secret = base_dir.join("private.agekey");
     let extensions_dir = base_dir.join("extensions");
 
     // Ensure directory structure exists
-    fs::create_dir_all(&prefix).context("Failed to create store directory")?;
+    fs::create_dir_all(&prefix).context("Failed to create vault directory")?;
     fs::create_dir_all(&extensions_dir).context("Failed to create extensions directory")?;
 
     Ok(Config {
         base_dir,
         prefix,
-        identities_file,
+        secret,
         extensions_dir,
         clip_time: env::var("PASSWORD_STORE_CLIP_TIME")
             .ok()

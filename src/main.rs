@@ -1,5 +1,6 @@
 mod cli;
 mod commands;
+mod completion;
 mod config;
 mod crypto;
 mod keygen;
@@ -21,6 +22,9 @@ fn main() -> Result<()> {
         } => {
             commands::show::run(&config, path, clip, qrcode, line)?;
         }
+        Command::List { path } => {
+            commands::list::run(&config, path)?;
+        }
         Command::Insert {
             path,
             prompt,
@@ -30,7 +34,8 @@ fn main() -> Result<()> {
             commands::insert::run(&config, path, prompt, echo, force)?;
         }
         Command::Init => {
-            keygen::generate_keypair(&config.identities_file, &config.base_dir.join("recipient"))?;
+            keygen::generate_keypair(&config.secret, &config.base_dir.join("public.key"))?;
+            completion::install()?;
         }
     }
 

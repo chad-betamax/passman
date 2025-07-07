@@ -8,7 +8,7 @@ pub fn run(config: &Config, path: String, clip: bool, qrcode: bool, line: usize)
         anyhow::bail!("No such password: {}", file_path.display());
     }
 
-    let decrypted = crypto::decrypt(&config.identities_file, &file_path)?;
+    let decrypted = crypto::decrypt(&config.secret, &file_path)?;
 
     if clip {
         println!("(Clipboard support not implemented yet)");
@@ -21,7 +21,7 @@ pub fn run(config: &Config, path: String, clip: bool, qrcode: bool, line: usize)
             anyhow::bail!("File {} has fewer than {} lines", path, line);
         }
     } else {
-        print!("{}", decrypted);
+        println!("{}", decrypted);
     }
 
     Ok(())

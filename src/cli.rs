@@ -47,4 +47,9 @@ pub enum Command {
 
     /// Generate a new rage keypair and store in ~/.passman
     Init,
+
+    List {
+        #[arg()]
+        path: Option<String>,
+    },
 }

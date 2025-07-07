@@ -1,7 +1,7 @@
 use std::fs::{self, File};
 use std::io::Write;
 use std::path::Path;
-use std::process::{Command, Stdio};
+use std::process::Command;
 
 use anyhow::{Context, Result};
 
@@ -44,10 +44,10 @@ pub fn generate_keypair(secret_path: &Path, public_path: &Path) -> Result<()> {
         .context("Failed to write public key to recipient file")?;
 
     println!("✅ Generated keypair:");
-    println!("  🔐 Secret:    {}", secret_path.display());
-    println!("  🟢 Recipient: {}", public_path.display());
+    println!("  🔐 Private:    {}", secret_path.display());
+    println!("  🟢 Public: {}", public_path.display());
     println!(
-        "\nPaste this key to another system to allow encryption to this identity:\n{}",
+        "\nCopy the public key to other systems to allow encryption to this identity:\n{}",
         public_key
     );
 

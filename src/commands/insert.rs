@@ -7,14 +7,9 @@ use std::process::Command;
 use tempfile::NamedTempFile;
 
 pub fn run(config: &Config, path: String, prompt: bool, _echo: bool, force: bool) -> Result<()> {
-    let recipient_path = config.base_dir.join("recipient");
-    let recipient = fs::read_to_string(&recipient_path)
-        .with_context(|| {
-            format!(
-                "Failed to read recipient file: {}",
-                recipient_path.display()
-            )
-        })?
+    let public_path = config.base_dir.join("public.key");
+    let public = fs::read_to_string(&public_path)
+        .with_context(|| format!("Failed to read public file: {}", public_path.display()))?
         .trim()
         .to_string();
 
@@ -26,13 +21,19 @@ pub fn run(config: &Config, path: String, prompt: bool, _echo: bool, force: bool
         );
     }
 
+    // 👇 Ensure parent directories exist
+    if let Some(parent) = output_path.parent() {
+        fs::create_dir_all(parent)
+            .with_context(|| format!("Failed to create directory {}", parent.display()))?;
+    }
+
     let password = if prompt {
         prompt_singleline(&path)?
     } else {
         edit_multiline()?
     };
 
-    crypto::encrypt(&recipient, &output_path, &password)?;
+    crypto::encrypt(&public, &output_path, &password)?;
     println!("Password for '{}' stored successfully.", path);
     Ok(())
 }
