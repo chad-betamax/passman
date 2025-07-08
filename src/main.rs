@@ -1,6 +1,6 @@
 mod cli;
 mod commands;
-mod completion;
+mod completions;
 mod config;
 mod crypto;
 mod keygen;
@@ -35,7 +35,7 @@ fn main() -> Result<()> {
         }
         Command::Init => {
             keygen::generate_keypair(&config.secret, &config.base_dir.join("public.key"))?;
-            completion::install()?;
+            completions::install()?;
         }
     }
 
