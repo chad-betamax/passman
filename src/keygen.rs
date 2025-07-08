@@ -2,10 +2,15 @@ use std::fs::{self, File};
 use std::io::Write;
 use std::path::Path;
 use std::process::Command;
+use which::which;
 
 use anyhow::{Context, Result};
 
 pub fn generate_keypair(secret_path: &Path, public_path: &Path) -> Result<()> {
+    // Ensure `rage` is installed
+    which("rage")
+        .context("`rage` not found in $PATH. Please install rage: https://github.com/str4d/rage")?;
+
     // Ensure parent dirs exist
     if let Some(parent) = secret_path.parent() {
         fs::create_dir_all(parent).context("Creating parent directory for identities file")?;
