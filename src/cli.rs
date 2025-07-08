@@ -48,6 +48,7 @@ pub enum Command {
     /// Generate a new rage keypair and store in ~/.passman
     Init,
 
+    /// Display vault contents in a tree structure
     List {
         #[arg()]
         path: Option<String>,
