@@ -4,6 +4,7 @@ mod completions;
 mod config;
 mod crypto;
 mod keygen;
+mod utils;
 
 use anyhow::Result;
 use clap::Parser;

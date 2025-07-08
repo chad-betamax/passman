@@ -1,5 +1,6 @@
 use crate::config::Config;
 use crate::crypto;
+use crate::utils::qr::print_qr;
 use anyhow::Result;
 
 pub fn run(config: &Config, path: String, clip: bool, qrcode: bool, line: usize) -> Result<()> {
@@ -10,18 +11,22 @@ pub fn run(config: &Config, path: String, clip: bool, qrcode: bool, line: usize)
 
     let decrypted = crypto::decrypt(&config.secret, &file_path)?;
 
+    let output = if line > 0 {
+        decrypted
+            .lines()
+            .nth(line - 1)
+            .ok_or_else(|| anyhow::anyhow!("File {} has fewer than {} lines", path, line))?
+            .to_string()
+    } else {
+        decrypted.clone()
+    };
+
     if clip {
         println!("(Clipboard support not implemented yet)");
     } else if qrcode {
-        println!("(QR code support not implemented yet)");
-    } else if line > 1 {
-        if let Some(line_str) = decrypted.lines().nth(line - 1) {
-            println!("{}", line_str);
-        } else {
-            anyhow::bail!("File {} has fewer than {} lines", path, line);
-        }
+        print_qr(&output)?;
     } else {
-        println!("{}", decrypted);
+        println!("{output}");
     }
 
     Ok(())

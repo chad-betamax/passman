@@ -18,7 +18,7 @@ pub enum Command {
         #[arg(short, long)]
         clip: bool,
 
-        /// Show as QR code (not implemented yet)
+        /// Show as QR code
         #[arg(long)]
         qrcode: bool,
 
