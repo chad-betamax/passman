@@ -3,7 +3,6 @@ mod commands;
 mod completions;
 mod config;
 mod crypto;
-mod keygen;
 mod utils;
 
 use anyhow::Result;
@@ -15,6 +14,9 @@ fn main() -> Result<()> {
     let config = config::load_config()?;
 
     match cli.command {
+        Command::Init => {
+            commands::init::run(&config)?;
+        }
         Command::Show {
             path,
             clip,
@@ -26,17 +28,13 @@ fn main() -> Result<()> {
         Command::List { path } => {
             commands::list::run(&config, path)?;
         }
-        Command::Insert {
+        Command::New {
             path,
             prompt,
             echo,
             force,
         } => {
-            commands::insert::run(&config, path, prompt, echo, force)?;
-        }
-        Command::Init => {
-            keygen::generate_keypair(&config.secret, &config.base_dir.join("public.key"))?;
-            completions::install()?;
+            commands::create::run(&config, path, prompt, echo, force)?;
         }
         Command::Remove { path } => {
             commands::remove::run(&config, path)?;

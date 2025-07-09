@@ -31,7 +31,7 @@ pub enum Command {
     },
 
     /// Insert a new password entry
-    Insert {
+    New {
         /// Entry name (e.g., example.com)
         path: String,
 

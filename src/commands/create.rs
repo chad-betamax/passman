@@ -22,7 +22,7 @@ pub fn run(config: &Config, path: String, prompt: bool, _echo: bool, force: bool
         );
     }
 
-    // 👇 Ensure parent directories exist
+    // Ensure parent directories exist
     if let Some(parent) = output_path.parent() {
         fs::create_dir_all(parent)
             .with_context(|| format!("Failed to create directory {}", parent.display()))?;
