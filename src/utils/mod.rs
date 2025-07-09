@@ -1,2 +1,2 @@
-pub mod git_sync;
+pub mod git_ops;
 pub mod qr;

@@ -1,6 +1,6 @@
 use crate::config::Config;
 use crate::crypto;
-use crate::utils::git_sync;
+use crate::utils::git_ops;
 use anyhow::{Context, Result};
 use std::fs;
 use std::io::{self, Write};
@@ -37,8 +37,8 @@ pub fn run(config: &Config, path: String, prompt: bool, _echo: bool, force: bool
     crypto::encrypt(&public, &output_path, &password)?;
     println!("Password for '{}' stored successfully.", path);
 
-    // ✅ Attempt to sync after successful write
-    git_sync::sync_vault(&config.prefix)
+    // Attempt to sync after successful write
+    git_ops::sync_vault(&config.prefix)
 }
 
 fn prompt_singleline(path: &str) -> Result<String> {

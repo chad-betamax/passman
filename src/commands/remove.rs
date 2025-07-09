@@ -1,5 +1,5 @@
 use crate::config::Config;
-use crate::utils::git_sync;
+use crate::utils::git_ops;
 use anyhow::{Context, Result};
 use std::fs;
 
@@ -16,7 +16,7 @@ pub fn run(config: &Config, path: String) -> Result<()> {
 
     // run from the vault dir ie the git root,
     // to pick up the deletion
-    git_sync::sync_vault(&config.prefix)?;
+    git_ops::sync_vault(&config.prefix)?;
 
     println!("✅ Removed entry `{}`", path);
     Ok(())
