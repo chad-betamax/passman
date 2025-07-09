@@ -23,7 +23,7 @@ pub enum Command {
 
         /// Show as QR code
         #[arg(long)]
-        qrcode: bool,
+        qr: bool,
 
         /// Line number to extract (default: 1)
         #[arg(long, default_value_t = 1)]

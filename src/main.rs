@@ -18,10 +18,10 @@ fn main() -> Result<()> {
         Command::Show {
             path,
             clip,
-            qrcode,
+            qr,
             line,
         } => {
-            commands::show::run(&config, path, clip, qrcode, line)?;
+            commands::show::run(&config, path, clip, qr, line)?;
         }
         Command::List { path } => {
             commands::list::run(&config, path)?;
