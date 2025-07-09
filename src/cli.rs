@@ -9,7 +9,7 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Command {
-    /// Generate a new rage keypair and store in ~/.passman
+    /// Do initial setup
     Init,
 
     /// Decrypt and display a stored password
@@ -53,8 +53,6 @@ pub enum Command {
         #[arg()]
         path: Option<String>,
     },
-    Remove {
-        /// Entry name to delete
-        path: String,
-    },
+    /// Delete a file (local & github)
+    Remove { path: String },
 }
