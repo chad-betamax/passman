@@ -40,6 +40,7 @@ pub fn run(config: &Config, path: Option<String>) -> Result<()> {
 fn walk(dir: &Path, prefix_parts: Vec<bool>) -> Result<()> {
     let mut entries = fs::read_dir(dir)?
         .filter_map(Result::ok)
+        .filter(|e| e.file_name() != ".git") // exclude .git directory
         .collect::<Vec<_>>();
 
     entries.sort_by_key(|e| e.file_name());

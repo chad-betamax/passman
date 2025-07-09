@@ -9,6 +9,9 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Command {
+    /// Generate a new rage keypair and store in ~/.passman
+    Init,
+
     /// Decrypt and display a stored password
     Show {
         /// Entry name (e.g., example.com)
@@ -45,12 +48,13 @@ pub enum Command {
         force: bool,
     },
 
-    /// Generate a new rage keypair and store in ~/.passman
-    Init,
-
     /// Display vault contents in a tree structure
     List {
         #[arg()]
         path: Option<String>,
+    },
+    Remove {
+        /// Entry name to delete
+        path: String,
     },
 }

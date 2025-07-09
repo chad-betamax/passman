@@ -38,6 +38,9 @@ fn main() -> Result<()> {
             keygen::generate_keypair(&config.secret, &config.base_dir.join("public.key"))?;
             completions::install()?;
         }
+        Command::Remove { path } => {
+            commands::remove::run(&config, path)?;
+        }
     }
 
     Ok(())
