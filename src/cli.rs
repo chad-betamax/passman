@@ -47,7 +47,11 @@ pub enum Command {
         #[arg(short, long)]
         force: bool,
     },
-
+    /// Edit an existing password entry
+    Edit {
+        /// Entry name (e.g., example.com)
+        path: String,
+    },
     /// Display vault contents in a tree structure
     List {
         #[arg()]

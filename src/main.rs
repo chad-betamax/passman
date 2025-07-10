@@ -36,6 +36,9 @@ fn main() -> Result<()> {
         } => {
             commands::create::run(&config, path, prompt, echo, force)?;
         }
+        Command::Edit { path } => {
+            commands::edit::run(&config, path)?;
+        }
         Command::Remove { path } => {
             commands::remove::run(&config, path)?;
         }

@@ -101,6 +101,9 @@ _{bin}_wrapper() {{
     elif [[ "$subcommand" == "new" ]]; then
         {list_pipe}
         COMPREPLY=( $(compgen -W "${{dirs}}" -- "${{cur}}") )
+    elif [[ "$subcommand" == "edit" ]]; then
+        {list_pipe}
+        COMPREPLY=( $(compgen -W "${{dirs}}" -- "${{cur}}") )
     elif [[ "$subcommand" == "show" ]]; then
         {show_pipe}
         COMPREPLY=( $(compgen -W "${{files}}" -- "${{cur}}") )
