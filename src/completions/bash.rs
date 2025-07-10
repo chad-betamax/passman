@@ -8,11 +8,11 @@ use std::{
 
 use crate::cli::Cli;
 
-/// Pipeline for `passman list`: complete only directories under vault
+/// Pipeline for `passman list` and `passman new`: complete directories under vault without trailing spaces
 fn vault_list_pipeline(vault_dir: &str) -> String {
     format!(
         r#"dirs=$(cd "{vault}" && find . -mindepth 1 -type d 2>/dev/null \
-             | sed -e 's|^\./||')"#,
+             | sed -e 's|^\./||' -e 's|$|/|')"#,
         vault = vault_dir
     )
 }
@@ -96,6 +96,9 @@ _{bin}_wrapper() {{
     subcommand="${{COMP_WORDS[1]}}"
 
     if [[ "$subcommand" == "list" ]]; then
+        {list_pipe}
+        COMPREPLY=( $(compgen -W "${{dirs}}" -- "${{cur}}") )
+    elif [[ "$subcommand" == "new" ]]; then
         {list_pipe}
         COMPREPLY=( $(compgen -W "${{dirs}}" -- "${{cur}}") )
     elif [[ "$subcommand" == "show" ]]; then
