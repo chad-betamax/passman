@@ -14,7 +14,7 @@ pub enum Command {
     /// Do initial setup
     Init,
 
-    /// Decrypt and display a stored password (or dump runtime config)
+    /// Decrypt and display an entry (or dump runtime config)
     Show {
         /// Dump runtime configuration instead of decrypting an entry
         #[clap(long)]
@@ -28,7 +28,7 @@ pub enum Command {
         #[clap(short, long)]
         clip: bool,
 
-        /// Show as QR code
+        /// Show file as QR code
         #[clap(long)]
         qr: bool,
 
@@ -55,7 +55,7 @@ pub enum Command {
         force: bool,
     },
 
-    /// Edit an existing password entry
+    /// Edit an existing password file
     Edit {
         /// Entry name (e.g., example.com)
         path: String,
@@ -66,6 +66,12 @@ pub enum Command {
         /// Optional sub-path within the vault
         #[clap()]
         path: Option<String>,
+    },
+
+    /// Hide a password file from the list command
+    Archive {
+        /// Path to the file you want to archive
+        path: String,
     },
 
     /// Delete a file (local & github)

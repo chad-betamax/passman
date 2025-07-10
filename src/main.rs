@@ -63,6 +63,11 @@ fn main() -> Result<()> {
             commands::list::run(&cfg, path)?;
         }
 
+        Command::Archive { path } => {
+            // Archive an entry by renaming it to a dot-prefixed hidden file
+            commands::archive::run(&cfg, path)?;
+        }
+
         Command::Remove { path } => {
             commands::remove::run(&cfg, path)?;
         }
