@@ -1,5 +1,6 @@
 pub mod age;
 pub mod backend;
+pub mod detect;
 pub mod rage;
 
 use age::Age;
@@ -30,4 +31,9 @@ pub fn encrypt(recipient: &str, output_file: &Path, plaintext: &str) -> Result<(
 /// Facade: caller just does `crypto::decrypt(...)`
 pub fn decrypt(identity_file: &Path, encrypted_file: &Path) -> Result<String> {
     pick_decrypt_backend(encrypted_file).decrypt(identity_file, encrypted_file)
+}
+
+/// Facade: caller just does `crypto::detect_backend()`
+pub fn detect_backend() -> Result<String> {
+    detect::detect_crypto_backend()
 }

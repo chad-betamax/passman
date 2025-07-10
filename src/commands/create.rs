@@ -8,13 +8,8 @@ use std::process::Command;
 use tempfile::NamedTempFile;
 
 pub fn run(config: &Config, path: String, prompt: bool, _echo: bool, force: bool) -> Result<()> {
-    let public_path = config.base_dir.join("public.key");
-    let public = fs::read_to_string(&public_path)
-        .with_context(|| format!("Failed to read public file: {}", public_path.display()))?
-        .trim()
-        .to_string();
+    let output_path = config.entry_path(&path);
 
-    let output_path = config.prefix.join(format!("{}.rage", path));
     if output_path.exists() && !force {
         anyhow::bail!(
             "Password already exists at {}. Use --force to overwrite.",
@@ -34,6 +29,7 @@ pub fn run(config: &Config, path: String, prompt: bool, _echo: bool, force: bool
         edit_multiline()?
     };
 
+    let public = config.read_public()?;
     crypto::encrypt(&public, &output_path, &password)?;
     println!("Password for '{}' stored successfully.", path);
 

@@ -11,14 +11,13 @@ pub fn run(
     qrcode: bool,
     line: Option<usize>,
 ) -> Result<()> {
-    let file_path = config.prefix.join(format!("{}.rage", path));
+    let file_path = config.entry_path(&path);
     if !file_path.exists() {
         anyhow::bail!("No such password: {}", file_path.display());
     }
 
     let decrypted = crypto::decrypt(&config.secret, &file_path)?;
 
-    // If `--line N` was provided (and N > 0), show that line; otherwise show all.
     let output = match line {
         None | Some(0) => decrypted.clone(),
         Some(n) => decrypted
