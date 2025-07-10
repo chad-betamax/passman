@@ -7,17 +7,18 @@ use std::{
 };
 
 use crate::cli::Cli;
-
-/// Pipeline for `passman list` and `passman new`: complete directories under vault without trailing spaces
+/// complete dirs under vault, excluding `.git` and its contents
 fn vault_list_pipeline(vault_dir: &str) -> String {
-    format!(
-        r#"dirs=$(cd "{vault}" && find . -mindepth 1 -type d 2>/dev/null \
-             | sed -e 's|^\./||' -e 's|$|/|')"#,
+    let find_cmd = format!(
+        "cd \"{vault}\" && find . -mindepth 1 \
+\\( -path './.git' -o -path './.git/*' \\) -prune -o \
+-type d -printf '%P/\\n' | sort -u",
         vault = vault_dir
-    )
+    );
+    format!("dirs=$({})", find_cmd)
 }
 
-/// Pipeline for `passman show`: complete only files under vault, strip both .rage and .age
+/// complete only files under vault, strip both .rage and .age
 fn vault_show_pipeline(vault_dir: &str) -> String {
     format!(
         r#"files=$(cd "{vault}" && find . -type f \( -name '*.rage' -o -name '*.age' \) 2>/dev/null \
@@ -29,17 +30,16 @@ fn vault_show_pipeline(vault_dir: &str) -> String {
 /// Generate & install both the base clap completions and
 /// the custom file-based wrapper into ~/.config/bash/completions/{bin}.bash
 pub fn install_file_path_completion(bin_name: &str) -> Result<()> {
-    // 1. Prepare the output path
+    // Prepare the output path
     let config_dir = dirs::config_dir().expect("Could not determine config dir");
     let bash_dir = config_dir.join("bash/completions");
     fs::create_dir_all(&bash_dir)?;
     let completion_file = bash_dir.join(format!("{}.bash", bin_name));
 
-    // 2. Generate the raw clap script
+    // Generate the raw clap script
     let mut cmd = Cli::command();
     generate_to(Bash, &mut cmd, bin_name, &bash_dir)?;
 
-    // 3. Patch out the old $2/$3 logic in the generated script header
     let raw = fs::read_to_string(&completion_file)?;
     let mut patched = Vec::with_capacity(raw.len());
     let mut in_header = false;
@@ -66,7 +66,7 @@ pub fn install_file_path_completion(bin_name: &str) -> Result<()> {
     }
     fs::write(&completion_file, patched.join("\n"))?;
 
-    // 4. Compute your vault-dir string
+    // Compute your vault-dir string
     let vault_dir_str = {
         let mut vault = dirs::data_dir().expect("Could not determine data dir");
         vault.push("passman");
@@ -74,7 +74,7 @@ pub fn install_file_path_completion(bin_name: &str) -> Result<()> {
         vault.to_string_lossy().into_owned()
     };
 
-    // 5. Append _{bin_name}_wrapper if not already present
+    // Append _{bin_name}_wrapper if not already present
     let already = {
         let f = fs::File::open(&completion_file)?;
         BufReader::new(f).lines().any(|l| {
@@ -95,31 +95,43 @@ _{bin}_wrapper() {{
     cur="${{COMP_WORDS[COMP_CWORD]}}"
     subcommand="${{COMP_WORDS[1]}}"
 
-    if [[ "$subcommand" == "list" ]]; then
+    if [[ "$subcommand" == "list" || "$subcommand" == "new" || "$subcommand" == "edit" ]]; then
         {list_pipe}
-        COMPREPLY=( $(compgen -W "${{dirs}}" -- "${{cur}}") )
-    elif [[ "$subcommand" == "new" ]]; then
-        {list_pipe}
-        COMPREPLY=( $(compgen -W "${{dirs}}" -- "${{cur}}") )
-    elif [[ "$subcommand" == "edit" ]]; then
-        {list_pipe}
-        COMPREPLY=( $(compgen -W "${{dirs}}" -- "${{cur}}") )
+
+        # read "$dirs" (newline-separated) into an array
+        local raw; IFS=$'\n' read -r -d '' -a raw < <(echo "$dirs"; printf '\0')
+
+        # filter out duplicates and anything not ending in '/'
+        declare -A seen
+        local filtered=() item
+        for item in "${{raw[@]}}"; do
+            if [[ "$item" == */ ]] && [[ -z "${{seen[$item]}}" ]]; then
+                filtered+=("$item")
+                seen[$item]=1
+            fi
+        done
+
+        COMPREPLY=( $(compgen -W "${{filtered[*]}}" -- "$cur") )
+        compopt -o nospace
+
     elif [[ "$subcommand" == "show" ]]; then
         {show_pipe}
-        COMPREPLY=( $(compgen -W "${{files}}" -- "${{cur}}") )
+        COMPREPLY=( $(compgen -W "${{files}}" -- "$cur") )
+
     else
-        # Delegate back to the original clap handler
+        # fallback to clap’s builtin handler
         _{bin} "$@"
     fi
 }}
 
-# Override default handler
-complete -F _{bin}_wrapper {bin}
+# install our wrapper (and disable the automatic space after “/”)
+complete -F _{bin}_wrapper -o nospace {bin}
 "#,
             bin = bin_name,
             list_pipe = list_pipe,
             show_pipe = show_pipe
         );
+
         f.write_all(wrapper.as_bytes())?;
     }
 
