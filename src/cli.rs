@@ -25,9 +25,9 @@ pub enum Command {
         #[arg(long)]
         qr: bool,
 
-        /// Line number to extract (default: 1)
-        #[arg(long, default_value_t = 1)]
-        line: usize,
+        /// Which line to show (1-based). If omitted, prints all lines.
+        #[arg(long)]
+        line: Option<usize>,
     },
 
     /// Insert a new password entry
