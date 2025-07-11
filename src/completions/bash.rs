@@ -7,24 +7,27 @@ use std::{
 };
 
 use crate::cli::Cli;
-/// complete dirs under vault, excluding `.git` and its contents
+
+/// complete directories under vault, excluding `.git` and its contents
 fn vault_list_pipeline(vault_dir: &str) -> String {
     let find_cmd = format!(
-        "cd \"{vault}\" && find . -mindepth 1 \
-\\( -path './.git' -o -path './.git/*' \\) -prune -o \
--type d -printf '%P/\\n' | sort -u",
+        r#"cd "{vault}" && \
+        find . -mindepth 1 \
+        \( -path './.git' -o -path './.git/*' \) -prune -o -type d -printf '%P/\n' | sort -u"#,
         vault = vault_dir
     );
     format!("dirs=$({})", find_cmd)
 }
 
-/// complete only files under vault, strip both .rage and .age
+/// complete files under vault, stripping .rage and .age extensions
 fn vault_show_pipeline(vault_dir: &str) -> String {
-    format!(
-        r#"files=$(cd "{vault}" && find . -type f \( -name '*.rage' -o -name '*.age' \) 2>/dev/null \
-             | sed -e 's|^\./||' -e 's|\.rage$||' -e 's|\.age$||')"#,
+    let find_cmd = format!(
+        r#"cd "{vault}" && \
+        find . \( -name '*.rage' -o -name '*.age' \) -printf '%P\n' | \
+        sed -e 's|\.rage$||' -e 's|\.age$||' | sort -u"#,
         vault = vault_dir
-    )
+    );
+    format!("files=$({})", find_cmd)
 }
 
 /// Generate & install both the base clap completions and

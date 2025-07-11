@@ -60,12 +60,14 @@ pub enum Command {
         /// Entry name (e.g., example.com)
         path: String,
     },
-
     /// Display vault contents in a tree structure
     List {
         /// Optional sub-path within the vault
         #[clap()]
         path: Option<String>,
+        /// Also include archived (dot-prefixed) entries
+        #[clap(long)]
+        all: bool,
     },
 
     /// Hide a password file from the list command

@@ -1,16 +1,23 @@
 use crate::config::Config;
 use anyhow::Result;
-use std::fs;
-use std::path::Path;
+use std::{fs, path::Path, path::PathBuf};
 
-pub fn run(config: &Config, path: Option<String>) -> Result<()> {
-    let base = match path {
+pub fn run(config: &Config, path: Option<String>, show_all: bool) -> Result<()> {
+    // Determine crypto file extension (ensure it starts with a dot)
+    let ext = if config.crypto_extension.starts_with('.') {
+        config.crypto_extension.clone()
+    } else {
+        format!(".{}", config.crypto_extension)
+    };
+
+    // Resolve base directory
+    let base: PathBuf = match path {
         Some(sub) => {
             let full_path = config.prefix.join(&sub);
             if full_path.is_dir() {
                 full_path
             } else {
-                let with_ext = config.prefix.join(format!("{sub}.rage"));
+                let with_ext = config.prefix.join(format!("{sub}{ext}"));
                 if with_ext.exists() {
                     println!("{}", sub);
                     return Ok(());
@@ -22,6 +29,7 @@ pub fn run(config: &Config, path: Option<String>) -> Result<()> {
         None => config.prefix.clone(),
     };
 
+    // Print header
     let label = base
         .strip_prefix(&config.prefix)
         .map(|p| {
@@ -33,22 +41,24 @@ pub fn run(config: &Config, path: Option<String>) -> Result<()> {
         })
         .unwrap_or_else(|_| base.display().to_string());
     println!("📂 {}", label);
-    walk(&base, vec![])?;
+
+    // Walk tree
+    walk(&base, vec![], show_all, &ext)?;
     Ok(())
 }
 
-fn walk(dir: &Path, prefix_parts: Vec<bool>) -> Result<()> {
+fn walk(dir: &Path, prefix_parts: Vec<bool>, show_all: bool, ext: &str) -> Result<()> {
     let mut entries = fs::read_dir(dir)?
         .filter_map(Result::ok)
         .filter(|e| {
             let file_name_os = e.file_name();
             let name = file_name_os.to_string_lossy();
-            name != ".git" && !name.starts_with('.')
-        }) // exclude .git and hidden (dot-prefixed) entries
+            // Always skip .git, and skip hidden unless --all
+            name != ".git" && (show_all || !name.starts_with('.'))
+        })
         .collect::<Vec<_>>();
 
     entries.sort_by_key(|e| e.file_name());
-
     let last_idx = entries.len().saturating_sub(1);
 
     for (i, entry) in entries.into_iter().enumerate() {
@@ -71,9 +81,9 @@ fn walk(dir: &Path, prefix_parts: Vec<bool>) -> Result<()> {
             println!("{}{}", branch, name);
             let mut new_prefix = prefix_parts.clone();
             new_prefix.push(!is_last);
-            walk(&path, new_prefix)?;
-        } else if name.ends_with(".rage") {
-            let short = name.strip_suffix(".rage").unwrap_or(&name);
+            walk(&path, new_prefix, show_all, ext)?;
+        } else if name.ends_with(ext) {
+            let short = name.strip_suffix(ext).unwrap_or(&name);
             println!("{}{}", branch, short);
         }
     }

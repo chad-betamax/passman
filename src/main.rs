@@ -58,9 +58,8 @@ fn main() -> Result<()> {
         Command::Edit { path } => {
             commands::edit::run(&cfg, path)?;
         }
-
-        Command::List { path } => {
-            commands::list::run(&cfg, path)?;
+        Command::List { path, all } => {
+            commands::list::run(&cfg, path, all)?;
         }
 
         Command::Archive { path } => {
