@@ -24,10 +24,6 @@ pub enum Command {
         #[clap(value_name = "PATH", required_unless_present = "config")]
         path: Option<String>,
 
-        /// Copy to clipboard (not implemented yet)
-        #[clap(short, long)]
-        clip: bool,
-
         /// Show file as QR code
         #[clap(long)]
         qr: bool,
@@ -41,18 +37,6 @@ pub enum Command {
     New {
         /// Entry name (e.g., example.com)
         path: String,
-
-        /// Prompt for single-line input instead of opening $EDITOR
-        #[clap(short, long)]
-        prompt: bool,
-
-        /// Echo input to screen (not implemented yet)
-        #[clap(short, long)]
-        echo: bool,
-
-        /// Overwrite existing entry
-        #[clap(short, long)]
-        force: bool,
     },
 
     /// Edit an existing password file

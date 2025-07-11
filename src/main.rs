@@ -29,12 +29,11 @@ fn main() -> Result<()> {
         Command::Show {
             config: false,
             path: Some(path),
-            clip,
             qr,
             line,
         } => {
             // Show an entry
-            commands::show::run(&cfg, path, clip, qr, line)?;
+            commands::show::run(&cfg, path, qr, line)?;
         }
 
         Command::Show {
@@ -46,18 +45,14 @@ fn main() -> Result<()> {
             unreachable!("`path` is required when `--config` is not set");
         }
 
-        Command::New {
-            path,
-            prompt,
-            echo,
-            force,
-        } => {
-            commands::create::run(&cfg, path, prompt, echo, force)?;
+        Command::New { path } => {
+            commands::create::run(&cfg, path)?;
         }
 
         Command::Edit { path } => {
             commands::edit::run(&cfg, path)?;
         }
+
         Command::List { path, all } => {
             commands::list::run(&cfg, path, all)?;
         }

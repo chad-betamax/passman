@@ -4,13 +4,7 @@ use crate::utils::qr::print_qr;
 use anyhow::Result;
 
 /// Show a password entry, optionally only a single line.
-pub fn run(
-    config: &Config,
-    path: String,
-    clip: bool,
-    qrcode: bool,
-    line: Option<usize>,
-) -> Result<()> {
+pub fn run(config: &Config, path: String, qrcode: bool, line: Option<usize>) -> Result<()> {
     let file_path = config.entry_path(&path);
     if !file_path.exists() {
         anyhow::bail!("No such password: {}", file_path.display());
@@ -27,9 +21,7 @@ pub fn run(
             .to_string(),
     };
 
-    if clip {
-        println!("(Clipboard support not implemented yet)");
-    } else if qrcode {
+    if qrcode {
         print_qr(&output)?;
     } else {
         println!("{}", output);
