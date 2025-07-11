@@ -11,10 +11,13 @@ pub struct Cli {
 
 #[derive(Subcommand, Debug)]
 pub enum Command {
-    /// Do initial setup
-    Init,
+    /// Insert a new password entry
+    New {
+        /// Entry name (e.g., example.com)
+        path: String,
+    },
 
-    /// Decrypt and display an entry (or dump runtime config)
+    /// Display the decrypted contents of an entry (or dump runtime config)
     Show {
         /// Dump runtime configuration instead of decrypting an entry
         #[clap(long)]
@@ -28,15 +31,9 @@ pub enum Command {
         #[clap(long)]
         qr: bool,
 
-        /// Which line to show (1-based). If omitted, prints all lines.
+        /// Which line to show. If omitted, prints all lines.
         #[clap(long, hide = true)]
         line: Option<usize>,
-    },
-
-    /// Insert a new password entry
-    New {
-        /// Entry name (e.g., example.com)
-        path: String,
     },
 
     /// Edit an existing password file
@@ -65,4 +62,7 @@ pub enum Command {
         /// Entry name (e.g., example.com)
         path: String,
     },
+
+    /// Do initial setup
+    Init,
 }
