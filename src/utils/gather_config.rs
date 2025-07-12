@@ -34,6 +34,7 @@ pub fn extant_config() -> Result<ConfigDump> {
         "XDG_DATA_HOME",
         "PASSWORD_STORE_CLIP_TIME",
         "PASSMAN_PUBLIC_KEY",
+        "EDITOR",
     ] {
         if let Ok(val) = env::var(key) {
             env_map.insert(key.to_string(), val);
