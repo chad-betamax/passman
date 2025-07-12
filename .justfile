@@ -15,6 +15,6 @@ install:
 
 # Build + install, overwriting any existing binary
 upgrade:
-    cargo install --path . --locked --root {{INSTALL_ROOT}} --force
+    cargo install --path . --root {{INSTALL_ROOT}} --force
 
 

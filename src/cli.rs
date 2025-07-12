@@ -1,5 +1,3 @@
-// src/cli.rs
-
 use clap::{Parser, Subcommand};
 
 #[derive(Parser, Debug)]
@@ -11,19 +9,19 @@ pub struct Cli {
 
 #[derive(Subcommand, Debug)]
 pub enum Command {
-    /// Insert a new password entry
+    /// Create a new password entry
     New {
-        /// Entry name (e.g., example.com)
+        /// /path/to/passwordfile
         path: String,
     },
 
-    /// Display the decrypted contents of an entry (or dump runtime config)
+    /// Display a decrypted entry (or dump runtime config)
     Show {
         /// Dump runtime configuration instead of decrypting an entry
         #[clap(long)]
         config: bool,
 
-        /// Entry name (e.g., example.com)
+        /// /path/to/passwordfile
         #[clap(value_name = "PATH", required_unless_present = "config")]
         path: Option<String>,
 
@@ -38,12 +36,13 @@ pub enum Command {
 
     /// Edit an existing password file
     Edit {
-        /// Entry name (e.g., example.com)
+        /// /path/to/passwordfile
         path: String,
     },
+
     /// Display vault contents in a tree structure
     List {
-        /// Optional sub-path within the vault
+        /// /path/to/passwordfile
         #[clap()]
         path: Option<String>,
         /// Also include archived (dot-prefixed) entries
@@ -53,13 +52,17 @@ pub enum Command {
 
     /// Hide a password file from the list command
     Archive {
-        /// Path to the file you want to archive
+        /// /path/to/thing/tobearchived
         path: String,
+
+        /// Archive entire folder
+        #[clap(long)]
+        folder: bool,
     },
 
-    /// Delete a file (local & github)
+    /// Delete a file (local & remote)
     Remove {
-        /// Entry name (e.g., example.com)
+        /// /path/to/passwordfile
         path: String,
     },
 
