@@ -201,10 +201,9 @@ mod tests {
         // stub decrypt to return some non-empty plaintext
         set_decrypt_factory(ok_factory_orig);
 
-        // script that simply exits with code 1
-        let script = make_editor_script(&tmp, "exit 1");
+        // Use the builtin `false` to simulate an editor that runs but exits non-zero
         unsafe {
-            env::set_var("EDITOR", &script);
+            std::env::set_var("EDITOR", "false");
         }
 
         let err = run(&cfg, "entry".into()).unwrap_err();
