@@ -15,10 +15,6 @@ pub struct Config {
     /// `<base_dir>/private.rage` or `.age`
     pub secret: PathBuf,
 
-    /// Clipboard timeout (seconds)
-    #[allow(dead_code)]
-    pub clip_time: u64,
-
     /// File extension for encrypted entries, e.g. "age" or "rage"
     pub crypto_extension: String,
 
@@ -68,12 +64,6 @@ pub fn load_config() -> Result<Config> {
     // Ensure vault dir exists
     fs::create_dir_all(&prefix).context("Failed to create passman vault directory")?;
 
-    // Clipboard timeout override
-    let clip_time = env::var("PASSWORD_STORE_CLIP_TIME")
-        .ok()
-        .and_then(|s| s.parse().ok())
-        .unwrap_or(45);
-
     // Public key filename override
     let public_key_filename =
         env::var("PASSMAN_PUBLIC_KEY").unwrap_or_else(|_| "public.key".to_string());
@@ -82,7 +72,6 @@ pub fn load_config() -> Result<Config> {
         base_dir,
         prefix,
         secret,
-        clip_time,
         crypto_extension,
         public_key_filename,
     })

@@ -90,3 +90,95 @@ fn walk(dir: &Path, prefix_parts: Vec<bool>, show_all: bool, ext: &str) -> Resul
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::config::Config;
+    use std::fs::File;
+    use tempfile::TempDir;
+
+    /// Build a Config pointing `prefix` at the temp directory.
+    fn make_config(tmp: &TempDir, ext: &str) -> Config {
+        Config {
+            base_dir: tmp.path().to_path_buf(),
+            prefix: tmp.path().to_path_buf(),
+            secret: tmp.path().join("secret.key"),
+            crypto_extension: ext.into(),
+            public_key_filename: "public.key".into(),
+        }
+    }
+
+    #[test]
+    fn missing_entry_returns_err() {
+        let tmp = TempDir::new().unwrap();
+        let cfg = make_config(&tmp, "rage");
+
+        let err = run(&cfg, Some("nope".to_string()), false).unwrap_err();
+        assert_eq!(err.to_string(), "Entry not found: nope");
+    }
+
+    #[test]
+    fn file_entry_returns_ok() {
+        let tmp = TempDir::new().unwrap();
+        let cfg = make_config(&tmp, "rage");
+        // create foo.rage
+        File::create(tmp.path().join("foo.rage")).unwrap();
+
+        assert!(run(&cfg, Some("foo".to_string()), false).is_ok());
+    }
+
+    #[test]
+    fn directory_entry_returns_ok() {
+        let tmp = TempDir::new().unwrap();
+        let cfg = make_config(&tmp, "rage");
+        // create a subdir
+        let sub = tmp.path().join("subdir");
+        fs::create_dir_all(&sub).unwrap();
+
+        assert!(run(&cfg, Some("subdir".to_string()), false).is_ok());
+    }
+
+    #[test]
+    fn extension_formatting_dot_and_no_dot() {
+        let tmp = TempDir::new().unwrap();
+        // ext without dot
+        let cfg1 = make_config(&tmp, "age");
+        let err1 = run(&cfg1, Some("x".to_string()), false).unwrap_err();
+        assert_eq!(err1.to_string(), "Entry not found: x");
+
+        // ext with dot
+        let cfg2 = make_config(&tmp, ".age");
+        let err2 = run(&cfg2, Some("x".to_string()), false).unwrap_err();
+        assert_eq!(err2.to_string(), "Entry not found: x");
+
+        // create a.age and x.age
+        File::create(tmp.path().join("a.age")).unwrap();
+        assert!(run(&cfg2, Some("a".to_string()), false).is_ok());
+
+        File::create(tmp.path().join("b.age")).unwrap();
+        assert!(run(&cfg1, Some("b".to_string()), false).is_ok());
+    }
+
+    #[test]
+    fn list_root_ok() {
+        let tmp = TempDir::new().unwrap();
+        let cfg = make_config(&tmp, "rage");
+        // empty directory
+        assert!(run(&cfg, None, false).is_ok());
+    }
+
+    #[test]
+    fn show_all_includes_hidden() {
+        let tmp = TempDir::new().unwrap();
+        let cfg = make_config(&tmp, "rage");
+        // create visible and hidden files
+        File::create(tmp.path().join("v.rage")).unwrap();
+        File::create(tmp.path().join(".h.rage")).unwrap();
+
+        // without show_all, Ok and skip hidden
+        assert!(run(&cfg, None, false).is_ok());
+        // with show_all, Ok and include hidden in walk
+        assert!(run(&cfg, None, true).is_ok());
+    }
+}

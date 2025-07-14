@@ -7,13 +7,17 @@ edition = "2024"
 clap = { version = "4", features = ["derive"] }
 serde = { version = "1", features = ["derive"] }
 walkdir = "2"
-git2 = "0.18"
+git2 = "0.20.2"
 tempfile = "3"
-arboard = "2"
-qrcode = "0.13"
+arboard = "3.6.0"
+qrcode = "0.14.1"
 dialoguer = "0.11"
 anyhow = "1.0.98"
 dirs = "6.0.0"
 clap_complete = "4.5.54"
 which = "8.0.0"
 serde_json = "1.0.140"
+
+[dev-dependencies]
+mockall = "0.13.1"
+serial_test = "3.2.0"

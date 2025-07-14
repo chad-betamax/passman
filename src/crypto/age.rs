@@ -2,7 +2,7 @@ use anyhow::{Context, Result};
 use std::path::Path;
 use std::process::{Command, Stdio};
 
-use crate::crypto::CryptoBackend;
+use crate::crypto::backend::CryptoBackend;
 
 pub struct Age;
 

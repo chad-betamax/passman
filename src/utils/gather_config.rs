@@ -14,7 +14,6 @@ pub struct ConfigDump {
     pub base_dir: String,
     pub prefix: String,
     pub secret: String,
-    pub clip_time: u64,
     pub crypto_extension: String,
     pub public_key_filename: String,
     pub env: HashMap<String, String>,
@@ -32,7 +31,6 @@ pub fn extant_config() -> Result<ConfigDump> {
     for &key in &[
         "PASSMAN_DIR",
         "XDG_DATA_HOME",
-        "PASSWORD_STORE_CLIP_TIME",
         "PASSMAN_PUBLIC_KEY",
         "EDITOR",
     ] {
@@ -67,7 +65,6 @@ pub fn extant_config() -> Result<ConfigDump> {
         base_dir: cfg.base_dir.display().to_string(),
         prefix: cfg.prefix.display().to_string(),
         secret: cfg.secret.display().to_string(),
-        clip_time: cfg.clip_time,
         crypto_extension: cfg.crypto_extension,
         public_key_filename: cfg.public_key_filename,
         env: env_map,
