@@ -184,11 +184,9 @@ mod tests {
     #[test]
     #[serial]
     fn real_edit_editor_failure() -> Result<()> {
-        let tmp = TempDir::new()?;
-        // script that exits non-zero
-        let script = make_editor_script(&tmp, "exit 1");
+        // Use the builtin `false` to simulate an editor that runs but exits non-zero
         unsafe {
-            std::env::set_var("EDITOR", &script);
+            std::env::set_var("EDITOR", "false");
         }
 
         let err = real_edit().unwrap_err();
